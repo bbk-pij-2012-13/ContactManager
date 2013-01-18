@@ -1,4 +1,4 @@
-public class ContactImpl
+public class ContactImpl implements Contact
 {
 	private int id;
 	private String name;
@@ -26,7 +26,7 @@ public class ContactImpl
 	
 	public int getId()
 	{
-	 return this.id;
+	 return this.cont;
 	
 	}
 		

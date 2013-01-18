@@ -2,7 +2,7 @@ import java.util.Calendar;
 import java.util.Set;
 import java.util.*;
 
-public class MeetingImpl
+public class MeetingImpl implements Meeting
 {
 
 	private int id;
@@ -41,7 +41,13 @@ public class MeetingImpl
 	
 	}
 
+	public generateId()
 
+	{
+
+
+	}
+	
 	public int getId()
 	{
 	  return this.id;
