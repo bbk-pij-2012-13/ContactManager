@@ -22,6 +22,30 @@ public class ContactImpl implements Contact
 
 	}
 
+	@Override
+	public boolean equals (Object o)
+	{
+		if(o!=null && o instanceof ContactImpl)
+		{
+			ContactImpl cont=(ContactImpl)o;
+			return this.id==cont.getId();
+			
+		}
+		else
+		{
+			return false;
+		}
+		
+
+	}
+	
+	@Override
+	public int hashCode()
+	{
+	  return this.id;
+	
+	
+	}
 
 	
 	public int getId()
