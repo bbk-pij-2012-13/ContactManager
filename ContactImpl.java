@@ -1,26 +1,24 @@
-public class ContactImpl implements Contact
+import java.io.*;
+public class ContactImpl implements Contact,Serializable
 {
 	private int id;
 	private String name;
 	private String notes;
-	private int cont=0;
-
-	public Contact(String n)
-	{
-		 this.name=n;
-		 this.id=cont;
-		 cont ++;
-
-	}
 	
-	public Contact(String n,String  not)
+
+	
+	
+	
+	
+	public ContactImpl(String n,String  not,int code)
 	{
 		 this.name=n;
 		 this.notes= not;
-		 this.id=cont;
-		 cont ++;
+		 this.id=code;
+		
 
 	}
+
 
 	@Override
 	public boolean equals (Object o)
