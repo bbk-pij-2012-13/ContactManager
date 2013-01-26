@@ -172,7 +172,7 @@ import java.io.*;
 		}
 
 		
-		void addNewPastMeeting(Set<Contact> contacts,Calendar date,String text)
+		public void addNewPastMeeting(Set<Contact> contacts,Calendar date,String text)
 		{
 			Meeting m;
 			Contact temp1=null;
@@ -245,7 +245,11 @@ import java.io.*;
 			
 			}
 		
+		public Set<Contact> getContacts(String name)
+		{
 		
+		
+		}
 		
 		
 		public void printcontacts()
@@ -342,7 +346,7 @@ import java.io.*;
 		 
 
 	
-		void flush() throws IOException
+		public void flush() throws IOException
 		{
 		
 		 FileOutputStream fo= new FileOutputStream(path);

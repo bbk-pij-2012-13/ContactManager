@@ -1,6 +1,6 @@
 import java.util.Calendar;
 import java.util.Set;
-
+import java.io.*;
 
 public class PastMeetingImpl implements PastMeeting,Serializable
 {
@@ -9,13 +9,13 @@ public class PastMeetingImpl implements PastMeeting,Serializable
 	private Set<Contact> contacts;
 	String notes;
 	
-	public PastMeeting(Set<Contact> contacts,Calendar date)
+	public PastMeetingImpl(Set<Contact> contacts,Calendar date)
 	{
 		this.contacts=contacts;
 		this.date=date;
 		
 	}
-	public PastMeeting(Set<Contact> contacts,Calendar date,String text)
+	public PastMeetingImpl(Set<Contact> contacts,Calendar date,String text)
 	{
 		this.contacts=contacts;
 		this.date=date;
@@ -28,7 +28,20 @@ public class PastMeetingImpl implements PastMeeting,Serializable
 	
 	}
 	
+	public Calendar getDate()
+	{
 	
+		return this.date;
+	
+	}
+	
+	public Set<Contact> getContacts()
+	{
+	
+	 return contacts;
+	
+	}
+
 	public String getNotes()
 	{
       return this.notes;

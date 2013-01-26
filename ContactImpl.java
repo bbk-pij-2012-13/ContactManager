@@ -48,7 +48,7 @@ public class ContactImpl implements Contact,Serializable
 	
 	public int getId()
 	{
-	 return this.cont;
+	 return this.id;
 	
 	}
 		
