@@ -21,7 +21,12 @@ public class PastMeetingImpl implements PastMeeting,Serializable
 		this.date=date;
 		this.notes=text;
 	}
-
+	
+	public int getId()
+	{
+	  return this.id;
+	
+	}
 	
 	
 	public String getNotes()

@@ -8,7 +8,7 @@ import java.io.*;
 		private  Map < Integer,Meeting> agenda;
 		
 
-		public ContactManagerprueba()throws IOException,ClassNotFoundException
+		public ContactManagerImpl()throws IOException,ClassNotFoundException
 		{
 			FileInputStream fi=null;
 			ObjectInputStream oi=null;
@@ -71,6 +71,143 @@ import java.io.*;
 		}
 		
 		
+		
+		public PastMeeting getPastMeeting(int id)
+		{
+		  
+			PastMeeting pm=null;
+			if(agenda.get(id).getDate().after(Calendar.getInstance()))
+				{
+					throw new IllegalArgumentException(    "Error" );
+				}
+		  
+			else
+				{
+					 pm=(PastMeeting)agenda.get(id);
+				}
+		   
+			return pm;   
+		   
+		  
+		}
+		
+		
+		public FutureMeeting getFutureMeeting(int id)
+		{
+			FutureMeeting fmeet= null;
+			if(agenda.containsKey(id))
+			{
+				FutureMeeting m= (FutureMeeting)agenda.get(id);
+				if (m instanceof FutureMeeting)
+				{
+					
+				
+					if (m.getDate().before(Calendar.getInstance()))
+					{
+					  throw new IllegalArgumentException(    "There's a meeting with this Id that happened in the past" );
+					}
+					else
+					{
+					  fmeet=m;
+					}
+				}
+		   
+			}	
+			return fmeet;
+		}
+			
+	
+
+		public Meeting getMeeting(int id)
+		{
+
+		
+			Meeting temp=null; 
+			if (agenda.containsKey(id))
+			   {
+				 temp=(Meeting)agenda.get(id);
+			   }
+			
+			return temp;
+				
+			
+		}
+
+	
+		public List<Meeting> getFutureMeetingList(Contact contact)
+		{
+		  
+			if(!contacts_set.containsValue(contact))
+			{
+					 throw new IllegalArgumentException(    "Id doesn't correspond to a real contact" );
+			}
+			
+			List<Meeting> result=new ArrayList<Meeting>();
+			Set set=agenda.keySet();
+			Iterator<Integer> it=set.iterator();
+			Integer id=null;
+			Meeting m=null;
+			
+			while(it.hasNext())
+			{
+				//id of the meeting
+				id=(Integer)it.next(); 
+				
+				m=(Meeting)agenda.get(id);
+				
+				//COntact set of each meeting
+				
+				Set st=m.getContacts();
+				if (st.contains(contact))
+				
+				{
+				  result.add(m);
+				}
+					
+			
+			}
+		  
+		  return result;
+			
+		}
+
+		
+		void addNewPastMeeting(Set<Contact> contacts,Calendar date,String text)
+		{
+			Meeting m;
+			Contact temp1=null;
+			if (contacts==null)
+			{
+			  throw new IllegalArgumentException(    "Client not found" );
+			
+			}
+			else 
+			{
+				for(Iterator<Contact> it=contacts.iterator();it.hasNext();)
+				{
+					temp1=it.next();
+				   if (!contacts_set.containsValue(temp1))
+					{
+						throw new IllegalArgumentException(    "Client not found" );
+				 
+					}
+						
+				}
+			}
+			 
+			if(contacts==null ||date==null||text==null)
+			{
+			
+				 throw new NullPointerException("Some of the arguments are null");
+			}
+			m= new PastMeetingImpl(contacts,date,text);
+		
+		
+		
+		}
+		
+		
+		
 	
 		public void addNewContact(String name, String notes)
 		{
@@ -80,7 +217,37 @@ import java.io.*;
 			contacts_set.put(j,c); 
 		}
 
-	
+		
+		
+		
+		public Set<Contact> getContacts(int... ids)
+			{
+			 
+				Set<Contact> set= new HashSet<Contact> ();
+				Contact temp=null;
+				
+				for (int i=0;i<ids.length;i++)
+				{
+					if(!contacts_set.containsKey(ids[i]))
+					{
+									
+						throw new IllegalArgumentException(    "Id doesn't correspond to a real contact" );
+					}
+					
+					else
+					{
+						set.add(contacts_set.get(ids[i]));
+					
+					}	 
+				}
+				
+				return set;
+			
+			}
+		
+		
+		
+		
 		public void printcontacts()
 		{
 			
@@ -129,30 +296,7 @@ import java.io.*;
 			}
 		}
 		
-		public Set<Contact> getContacts(int... ids)
-		{
-		 
-			Set<Contact> set= new HashSet<Contact> ();
-			Contact temp=null;
-			
-			for (int i=0;i<ids.length;i++)
-			{
-				if(!contacts_set.containsKey(ids[i]))
-				{
-								
-					throw new IllegalArgumentException(    "Id doesn't correspond to a real contact" );
-				}
-				
-				else
-				{
-					set.add(contacts_set.get(ids[i]));
-				
-				}	 
-			}
-			
-			return set;
 		
-		}
 		
 		
 		public  int generate_id_contact()
