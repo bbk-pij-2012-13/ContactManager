@@ -260,7 +260,45 @@ import java.io.*;
 		}
 
 		
-		
+		public void addMeetingNotes(int id, String text)
+		{
+			
+			if (text==null)
+			{
+				throw new NullPointerException("The notes are null");			
+			}
+			if(!agenda.containsKey(id))
+			{
+				throw new IllegalArgumentException(  "This meeting, Id, doesn't exist");
+			}
+			
+			else if (agenda.get(id).getDate().after(Calendar.getInstance()))	 
+			{
+				throw new IllegalArgumentException(  "This meeting is set for date in the future");
+			}
+			
+			//PastMeeting or PastMeetingImpl??
+			else if (agenda.get(id) instanceof PastMeeting)				
+			{
+			   
+			   ((PastMeetingImpl)agenda).setNotes(text);
+			 
+			}
+			
+			else if (agenda.get(id) instanceof FutureMeeting)
+			{
+				Meeting m=agenda.get(id);
+				Calendar date=m.getDate();
+				Set<Contact> contacts=m.getContacts();
+				Meeting pastmeet= new PastMeetingImpl(id,date,contacts,text);
+				agenda.remove(id);
+				agenda.put(id,pastmeet);
+			 
+			}	 
+			
+			  
+		}
+			
 		
 		public Set<Contact> getContacts(int... ids)
 			{
