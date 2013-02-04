@@ -142,44 +142,89 @@ import java.io.*;
 					 throw new IllegalArgumentException(    "Id doesn't correspond to a real contact" );
 			}
 			
-			List<Meeting> result=new ArrayList<Meeting>();
+			List<FutureMeetingImpl> temp=new ArrayList<FutureMeetingImpl>();
+			List<Meeting> temp2=new ArrayList<Meeting>();
 			Set set=agenda.keySet();
 			Iterator<Integer> it=set.iterator();
 			Integer id=null;
 			Meeting m=null;
+			FutureMeetingImpl fm=null;
+			int i=0;
 			
 			while(it.hasNext())
 			{
 				//id of the meeting
 				id=(Integer)it.next(); 
-				
-				m=(Meeting)agenda.get(id);
-				
-				//COntact set of each meeting
-				
-				Set st=m.getContacts();
-				if (st.contains(contact))
-				
+				m= (Meeting)agenda.get(id);
+				if (m instanceof FutureMeetingImpl)
 				{
-				  result.add(m);
+					fm=(FutureMeetingImpl)m;
+					//COntact set of each meeting
+					Set st=fm.getContacts();
+					if (st.contains(contact))
+					{
+					  temp.add(i,fm);
+					  i++;
+					}
 				}
+			}
+			
+			Collections.sort(temp);
 					
+			for (int j=0;j<temp.size();j++)
+			{
+			 temp2.add(j,(Meeting)temp.get(j));
 			
 			}
-		  
-		  return result;
 			
+			return temp2;
+		
 		}
 
+		public List<PastMeeting> getPastMeetingList(Contact c)
+		{
+			if(!contacts_set.containsValue(c))
+			{
+			throw new IllegalArgumentException(    "Id doesn't correspond to a real contact" ); 
+			
+			}
+			else
+			{
+				Set set=agenda.keySet();
+				Iterator<Integer> it=set.iterator();
+				Integer id=null;
+				Meeting m=null;
+				List<PastMeeting> lspast=new ArrayList<PastMeeting>();
+				while(it.hasNext())
+				{
+					
+					id=(Integer)it.next();
+					m=(Meeting)agenda.get(id);
+					if (m instanceof PastMeetingImpl)
+					{
+						if ((m.getContacts()).contains(c))
+						{
+						  lspast.add((PastMeeting)m);
+						}
+					}
+				
+				}
+			
+				return lspast;
+			}
+		}
+		
+		
 		
 		public void addNewPastMeeting(Set<Contact> contacts,Calendar date,String text)
 		{
 			Meeting m;
 			Contact temp1=null;
-			if (contacts==null)
-			{
-			  throw new IllegalArgumentException(    "Client not found" );
 			
+			if(contacts==null ||date==null||text==null)
+			{
+			
+				 throw new NullPointerException("Some of the arguments are null");
 			}
 			else 
 			{
@@ -194,15 +239,12 @@ import java.io.*;
 						
 				}
 			}
-			 
-			if(contacts==null ||date==null||text==null)
-			{
+			 		
 			
-				 throw new NullPointerException("Some of the arguments are null");
-			}
-			m= new PastMeetingImpl(contacts,date,text);
-		
-		
+			int j=generate_id_meeting();
+			m= new PastMeetingImpl(j,date,contacts,text);
+			System.out.println("Id meeting:"+ j);
+			agenda.put(j,m);
 		
 		}
 		
