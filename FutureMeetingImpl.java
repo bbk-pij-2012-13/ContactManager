@@ -65,6 +65,31 @@ public class FutureMeetingImpl  implements FutureMeeting,Serializable
 	
 	}
 
-
+	/**
+	*This methods is created to sort out the lists by date.
+	**/
+ @Override
+    public int compareTo(FutureMeetingImpl o) 
+	{
+        if (this.getDate().compareTo(o.getDate())>0)
+		{
+			return 1;
+		
+		}
+		if (this.getDate().compareTo(o.getDate())<0)
+		{
+			return -1;
+		
+		}
+		
+		else
+		 
+		 {
+		 return 0;
+		 }
+		
+		
+	
+    }
 
 }

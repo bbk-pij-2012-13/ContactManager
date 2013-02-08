@@ -4,7 +4,7 @@ import java.io.*;
 {
 		
 		private  Map <Integer,Contact> contacts_set;
-		private final String path="H:\\Agenda.obj";
+		private final String path="F:\\Agenda4.obj";
 		private  Map < Integer,Meeting> agenda;
 		
 
@@ -133,6 +133,12 @@ import java.io.*;
 			
 		}
 
+	/**
+	*Return the list of future meetings that are scheduled for this contact.
+	*@temp is a List of FutureMeetingImpl as it is created in order to sort the list by date (as we can´t make Meeting implements Comparable since we aren not allowed to modify the interfaces ).
+	*@temp2 is a List<Meeting>,downcast of temp, due to of the requirement of returning List<Meeting> 
+	*first we sort temp by date and after these "items" are copied and casted to Meeting in the new List<Meeting> temp
+	**/
 	
 		public List<Meeting> getFutureMeetingList(Contact contact)
 		{
@@ -194,7 +200,9 @@ import java.io.*;
 				Iterator<Integer> it=set.iterator();
 				Integer id=null;
 				Meeting m=null;
-				List<PastMeeting> lspast=new ArrayList<PastMeeting>();
+				PastMeetingImpl pm=null;
+				List<PastMeetingImpl> lspast=new ArrayList<PastMeetingImpl>();
+				List<PastMeeting> lspast2=new ArrayList<PastMeeting>();
 				while(it.hasNext())
 				{
 					
@@ -204,13 +212,23 @@ import java.io.*;
 					{
 						if ((m.getContacts()).contains(c))
 						{
-						  lspast.add((PastMeeting)m);
+							pm=(PastMeetingImpl)m;						 
+							lspast.add(pm);
 						}
 					}
+				  
+				}
+				Collections.sort(lspast);
+				
+				for (int i=0;i<lspast.size();i++)
+				{
+					lspast2.add((PastMeeting)lspast.get(i));
 				
 				}
-			
-				return lspast;
+				
+				
+				
+				return lspast2;
 			}
 		}
 		
@@ -327,7 +345,25 @@ import java.io.*;
 		
 		public Set<Contact> getContacts(String name)
 		{
-		
+		//trial not definitive
+			Set<Contact> result=new HashSet<Contact> ();
+			Set set=contacts_set.keySet();
+			Iterator<Integer> it=set.iterator();
+			Integer j=null;
+			Contact c= null;
+			while(it.hasNext())
+			{
+				j=(Integer)it.next();
+				c=(Contact)contacts_set.get(j);
+				if(c.getName().equals(name))
+				{
+					result.add(c);
+					
+				}
+			  
+			}
+			return result;
+			
 		
 		}
 		
@@ -426,16 +462,104 @@ import java.io.*;
 		 
 
 	
-		public void flush() throws IOException
+		public void flush() 
 		{
-		
-		 FileOutputStream fo= new FileOutputStream(path);
-		 ObjectOutputStream os= new ObjectOutputStream(fo);
-		 os.writeObject(agenda);
-		 os.writeObject(contacts_set);
-		 os.close();
-		
+			FileOutputStream fo;
+			 ObjectOutputStream os;
+			try{
+			fo= new FileOutputStream(path);
+			os= new ObjectOutputStream(fo);
+			if (os!=null)
+			{
+				os.writeObject(agenda);
+				os.writeObject(contacts_set);
+				os.flush();
+				os.close();
+			}
+			} catch (IOException ex) { }
 		
 		}
+		
+		
+		
+		public static void main(String[] args) throws IOException,ClassNotFoundException
+		{
+       
+			ContactManagerImpl cont=new ContactManagerImpl();
+			/*
+			cont.printMeeting();
+			cont.printcontacts();
+			
+			
+			Calendar date = Calendar.getInstance();
+			date.set(2018,10,21);
+			Calendar date2 = Calendar.getInstance();
+			date2.set(2014,2,19);
+			Calendar date3 = Calendar.getInstance();
+			date3.set(2013,9,22);
+			Calendar date4 = Calendar.getInstance();
+			date4.set(2015,5,30);
+		
+			Calendar date5 = Calendar.getInstance();
+			date5.set(2001, 2, 29,01, 27);
+
+			Calendar date6 = Calendar.getInstance();
+			date6.set(2003, 1, 01,13, 27);
+			Calendar date7 = Calendar.getInstance();
+			date7.set(2007, 10, 11,22, 27);
+			Calendar date8 = Calendar.getInstance();
+			date8.set(2006, 6, 15,11,30);
+			Set<Contact> setpast=cont.getContacts(60,905,684);
+			Set<Contact> setpast2=cont.getContacts(800,16);
+			Set<Contact> setpast3=cont.getContacts(393,111,617);
+			Set<Contact> setpast4=cont.getContacts(638,778,617);
+			Set<Contact> setpast5=cont.getContacts(905,16);
+			cont.addNewPastMeeting(setpast3,date5,"Esta es la primera prueba addNewPastMewegin");
+			cont.addNewPastMeeting(setpast,date6,"Esta es la ssegunda prueba addNewtPastMewegin");
+			cont.addNewPastMeeting(setpast4,date7,"Esta es la tercera prueba addNewPastMewegin");
+			cont.addNewPastMeeting(setpast5,date8,"Esta es la cuarta prueba addNewPastMewegin");
+			cont.addFutureMeeting(setpast2,date);
+			cont.addFutureMeeting(setpast3,date3);
+			cont.addFutureMeeting(setpast,date2);
+			cont.addFutureMeeting(setpast2,date4);
+			
+			
+			
+			*/
+			
+			Set contact=cont.getContacts(905);
+			Contact isa=null;
+			Iterator<Contact> it=contact.iterator();
+			while(it.hasNext())
+			{
+			 isa= it.next();
+			}
+			//AQUI PUSE LIST L=..... HAY QUE PONER SIEMPRE EL TIPO LIST<MEETING> SINO HACER LA CONVERSION.
+			List<PastMeeting> l=cont.getPastMeetingList(isa);
+			for (int i=0;i<l.size();i++)
+			{
+				System.out.println("Date of the meeting:   "+l.get(i).getDate().getTime()+"   Meeting ID: "+l.get(i).getId());
+			
+			}
+				
+				
+			
+			Contact domi=null;
+			Iterator<Contact> it2=contact.iterator();
+			while(it2.hasNext())
+			{
+			 domi= it2.next();
+			}
+			List<Meeting> l2=cont.getFutureMeetingList(domi);
+			for (int j=0;j<l2.size();j++)
+			{
+				System.out.println("Date of the meeting:   "+l2.get(j).getDate().getTime()+"   Meeting ID: "+l2.get(j).getId());
+			
+			}
+			
+			
+				cont.flush();
+			
+			}
 
 }

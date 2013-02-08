@@ -46,5 +46,33 @@ public class PastMeetingImpl implements PastMeeting,Serializable
 	{
       return this.notes;
 	}
+
+	
+ @Override
+    public int compareTo(PastMeetingImpl o) 
+	{
+        if (this.getDate().compareTo(o.getDate())>0)
+		{
+			return 1;
+		
+		}
+		if (this.getDate().compareTo(o.getDate())<0)
+		{
+			return -1;
+		
+		}
+		
+		else
+		 
+		 {
+		 return 0;
+		 }
+		
+		
+		//return (this.getDate().before(o.getDate()) ? 1 : (this.getDate().after(o.getDate())) ? -1 : 0);
+    }	
+	
+	
+	
 }
 
