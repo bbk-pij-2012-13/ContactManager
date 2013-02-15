@@ -3,7 +3,7 @@ import java.util.Set;
 import java.io.*;
 
 
-public class FutureMeetingImpl  implements FutureMeeting,Serializable
+public class FutureMeetingImpl  implements FutureMeeting,Serializable,Comparable<FutureMeetingImpl>
 {
 
 	private int id;
@@ -17,7 +17,12 @@ public class FutureMeetingImpl  implements FutureMeeting,Serializable
 		this.id=id;
 	}
 
-	
+	public FutureMeetingImpl(Set<Contact> conta,Calendar date)
+	{
+		this.contacts=conta;
+		this.date=date;
+		
+	}
 	
 	public int getId()
 	{
@@ -25,15 +30,25 @@ public class FutureMeetingImpl  implements FutureMeeting,Serializable
 	
 	}
 
-	
+	/**
+	*This method has been include to avoid that a meeting with a different id but the same contacts at a same date is added.
+	**/
+	/*
 	@Override
 	public boolean equals (Object o)
 	{
 		if(o!=null && o instanceof FutureMeetingImpl)
 		{
-			ContactImpl cont=(ContactImpl)o;
-			return this.id==cont.getId();
+			FutureMeetingImpl fm=(FutureMeetinImpl)o;
 			
+			if(this.id==fm.getId() && this.contacts.containsAll(fm.getContacts()))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
@@ -50,10 +65,11 @@ public class FutureMeetingImpl  implements FutureMeeting,Serializable
 	
 	
 	}
-	
+	*/
 	public Calendar getDate()
 	{
 	
+		System.out.println("FM getadate()");
 		return this.date;
 	
 	}

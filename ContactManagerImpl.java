@@ -4,7 +4,7 @@ import java.io.*;
 {
 		
 		private  Map <Integer,Contact> contacts_set;
-		private final String path="F:\\Agenda4.obj";
+		private final String path="H:\\Agenda5.obj";
 		private  Map < Integer,Meeting> agenda;
 		
 
@@ -31,10 +31,16 @@ import java.io.*;
 			
 		}
 	
+	
+		/**
+		*It has been included a while loop in order to search if it already exists a meeting with the same contacts at the same time 
+		*as nothing will prevent adding a meeting with the same features.
+		*If this happens, the method will not launch an Exception as this situation is not required according to the assignment.
+		*For simplicity it is not taking into account if it's added a meeting at a date where a contact is attending another meeting.
+		**/
 		public int addFutureMeeting(Set<Contact> contacts, Calendar date)
 		{
-			  //Contact c;
-			  //USO DE CONTAINSALL ();
+			  
 			 Contact temp1=null;
 			 
 			  for(Iterator<Contact> it=contacts.iterator();it.hasNext();)
@@ -48,8 +54,8 @@ import java.io.*;
 						}
 						
 				}
-					
 				
+			
 			 if ( date.before(Calendar.getInstance())) 
 				{
 					
@@ -59,14 +65,37 @@ import java.io.*;
 					
 				}
 				
-			  else
-			  {
-				int j=generate_id_meeting();
-				Meeting tempmeeting= new FutureMeetingImpl(contacts,date,j);
-				agenda.put(j,tempmeeting);
-				return tempmeeting.getId();
-			  }
-				
+			  else 
+				{
+			  
+					Set set=agenda.keySet();
+					Iterator<Integer> it=set.iterator();
+					Integer id=null;
+					Meeting m=null;
+					
+					while(it.hasNext())
+					{				
+						id=(Integer)it.next();
+						m=agenda.get(id);
+						if (m instanceof FutureMeetingImpl)
+						{					         				
+						  if (m.getDate().getTime().toString().equals(date.getTime().toString()))
+							{
+								if( m.getContacts().containsAll(contacts))
+							  {
+								System.out.println("You're trying to add a Meeting that already exists");
+							  }
+							}
+						  
+						}
+					
+					}
+			  
+					int j=generate_id_meeting();
+					Meeting tempmeeting= new FutureMeetingImpl(contacts,date,j);
+					agenda.put(j,tempmeeting);
+					return tempmeeting.getId();
+				}
 				
 		}
 		
@@ -76,7 +105,11 @@ import java.io.*;
 		{
 		  
 			PastMeeting pm=null;
-			if(agenda.get(id).getDate().after(Calendar.getInstance()))
+			if (!agenda.containsKey(id))
+			{
+				return pm;
+			}
+			else if(agenda.get(id).getDate().after(Calendar.getInstance()))
 				{
 					throw new IllegalArgumentException(    "Error" );
 				}
@@ -95,23 +128,27 @@ import java.io.*;
 		public FutureMeeting getFutureMeeting(int id)
 		{
 			FutureMeeting fmeet= null;
-			if(agenda.containsKey(id))
+			if (!agenda.containsKey(id))
 			{
-				FutureMeeting m= (FutureMeeting)agenda.get(id);
-				if (m instanceof FutureMeeting)
-				{
-					
-				
-					if (m.getDate().before(Calendar.getInstance()))
+				return fmeet;
+			}
+			else 
+			{
+				Meeting m= (Meeting)agenda.get(id);
+				if (m.getDate().before(Calendar.getInstance()))
 					{
 					  throw new IllegalArgumentException(    "There's a meeting with this Id that happened in the past" );
 					}
-					else
+				
+				
+				else
 					{
-					  fmeet=m;
+						
+						if (m instanceof FutureMeeting)
+						{
+							fmeet=(FutureMeeting)m;
+						}
 					}
-				}
-		   
 			}	
 			return fmeet;
 		}
@@ -133,12 +170,13 @@ import java.io.*;
 			
 		}
 
-	/**
-	*Return the list of future meetings that are scheduled for this contact.
-	*@temp is a List of FutureMeetingImpl as it is created in order to sort the list by date (as we can´t make Meeting implements Comparable since we aren not allowed to modify the interfaces ).
-	*@temp2 is a List<Meeting>,downcast of temp, due to of the requirement of returning List<Meeting> 
-	*first we sort temp by date and after these "items" are copied and casted to Meeting in the new List<Meeting> temp
-	**/
+		/**
+		*Return the list of future meetings that are scheduled for this contact.
+		*@temp is a List of FutureMeetingImpl;it has been created in order to sort the list by date. 
+		*as we can´t make Meeting implements Comparable since we are not allowed to modify the interfaces.
+		*@temp2 is a List<Meeting>,cast of temp, due to  the requirement of returning List<Meeting> 
+		*first we sort temp by date and after these "items" are copied and casted to Meeting in the new List<Meeting> temp
+		**/
 	
 		public List<Meeting> getFutureMeetingList(Contact contact)
 		{
@@ -187,6 +225,37 @@ import java.io.*;
 		
 		}
 
+	
+
+		public List<Meeting> getFutureMeetingList(Calendar date)
+		{	
+			Set<Integer> set=agenda.keySet();
+			Iterator<Integer> it=set.iterator();
+			List <FutureMeetingImpl> fm =null;
+			List<Meeting> result=null;
+			while(it.hasNext())
+			{
+				int i=it.next();
+				Meeting m=agenda.get(i);
+				FutureMeetingImpl f;
+				if (m instanceof FutureMeetingImpl && m.getDate()==date)
+				{
+					f=(FutureMeetingImpl)m;
+					fm.add(f);
+				
+				}
+			}
+			
+			Collections.sort(fm);
+			for(int i=0;i<fm.size();i++)
+			{
+				result.add((Meeting)fm.get(i));
+			}
+			return result;
+		
+		}
+
+
 		public List<PastMeeting> getPastMeetingList(Contact c)
 		{
 			if(!contacts_set.containsValue(c))
@@ -234,6 +303,7 @@ import java.io.*;
 		
 		
 		
+		
 		public void addNewPastMeeting(Set<Contact> contacts,Calendar date,String text)
 		{
 			Meeting m;
@@ -253,30 +323,15 @@ import java.io.*;
 					{
 						throw new IllegalArgumentException(    "Client not found" );
 				 
-					}
-						
+					}						
 				}
-			}
-			 		
 			
-			int j=generate_id_meeting();
-			m= new PastMeetingImpl(j,date,contacts,text);
-			System.out.println("Id meeting:"+ j);
-			agenda.put(j,m);
-		
+				int j=generate_id_meeting();
+				m= new PastMeetingImpl(j,date,contacts,text);
+				agenda.put(j,m);
+			}
 		}
 		
-		
-		
-	
-		public void addNewContact(String name, String notes)
-		{
-		
-			int j=generate_id_contact();
-			Contact c= new ContactImpl(name,notes,j);
-			contacts_set.put(j,c); 
-		}
-
 		
 		public void addMeetingNotes(int id, String text)
 		{
@@ -295,11 +350,12 @@ import java.io.*;
 				throw new IllegalArgumentException(  "This meeting is set for date in the future");
 			}
 			
-			//PastMeeting or PastMeetingImpl??
-			else if (agenda.get(id) instanceof PastMeeting)				
+			
+			else if (agenda.get(id) instanceof PastMeetingImpl)				
 			{
-			   
-			   ((PastMeetingImpl)agenda).setNotes(text);
+				Meeting m=(Meeting)agenda.get(id);
+				PastMeetingImpl p= (PastMeetingImpl)m;
+				p.setNotes(text);
 			 
 			}
 			
@@ -315,7 +371,19 @@ import java.io.*;
 			}	 
 			
 			  
+		}	
+	
+
+		public void addNewContact(String name, String notes)
+		{
+		
+			int j=generate_id_contact();
+			Contact c= new ContactImpl(name,notes,j);
+			contacts_set.put(j,c); 
 		}
+
+		
+		
 			
 		
 		public Set<Contact> getContacts(int... ids)
@@ -417,7 +485,9 @@ import java.io.*;
 		}
 		
 		
-		
+		/**
+		*For simplicity it has been considered a maximum amount of 1000 contacts. If it is intended to create more than 1000 the method will enter an infinite loop.
+		**/	
 		
 		public  int generate_id_contact()
 		{
@@ -439,6 +509,7 @@ import java.io.*;
 		
 		}
 	
+		
 		
 		
 		public  int generate_id_meeting()
@@ -486,34 +557,53 @@ import java.io.*;
 		{
        
 			ContactManagerImpl cont=new ContactManagerImpl();
+		
 			/*
-			cont.printMeeting();
+			
+			String a="Luisa";
+			String b="Dolores";
+			String c="Domingo";
+			String d="Isabel";
+			String e="Rosa";
+			String f="Isabel";
+			cont.addNewContact(a,"");
+			cont.addNewContact(b,"");
+			cont.addNewContact(c,"");
+			cont.addNewContact(d,"");
+			cont.addNewContact(e,"");
+			cont.addNewContact(f,"");
 			cont.printcontacts();
 			
 			
+			
+			
 			Calendar date = Calendar.getInstance();
-			date.set(2018,10,21);
+			date.set(2018,10,21,12,00,00);
 			Calendar date2 = Calendar.getInstance();
-			date2.set(2014,2,19);
+			date2.set(2014,2,19,11,30,00);
 			Calendar date3 = Calendar.getInstance();
-			date3.set(2013,9,22);
+			date3.set(2013,9,22,10,30,00);
 			Calendar date4 = Calendar.getInstance();
-			date4.set(2015,5,30);
+			date4.set(2015,5,30,14,00,00);
 		
 			Calendar date5 = Calendar.getInstance();
-			date5.set(2001, 2, 29,01, 27);
+			date5.set(2001, 2, 29,01, 27,00);
 
 			Calendar date6 = Calendar.getInstance();
-			date6.set(2003, 1, 01,13, 27);
+			date6.set(2003, 1, 01,13, 27,00);
 			Calendar date7 = Calendar.getInstance();
-			date7.set(2007, 10, 11,22, 27);
+			date7.set(2007, 10, 11,22, 27,00);
 			Calendar date8 = Calendar.getInstance();
-			date8.set(2006, 6, 15,11,30);
-			Set<Contact> setpast=cont.getContacts(60,905,684);
-			Set<Contact> setpast2=cont.getContacts(800,16);
-			Set<Contact> setpast3=cont.getContacts(393,111,617);
-			Set<Contact> setpast4=cont.getContacts(638,778,617);
-			Set<Contact> setpast5=cont.getContacts(905,16);
+			date8.set(2006, 6, 15,11,30,00);
+			
+			
+			
+			
+			Set<Contact> setpast=cont.getContacts(755,314);
+			Set<Contact> setpast2=cont.getContacts(755,314,640);
+			Set<Contact> setpast3=cont.getContacts(640,72);
+			Set<Contact> setpast4=cont.getContacts(811,72,995);
+			Set<Contact> setpast5=cont.getContacts(314,755,811);
 			cont.addNewPastMeeting(setpast3,date5,"Esta es la primera prueba addNewPastMewegin");
 			cont.addNewPastMeeting(setpast,date6,"Esta es la ssegunda prueba addNewtPastMewegin");
 			cont.addNewPastMeeting(setpast4,date7,"Esta es la tercera prueba addNewPastMewegin");
@@ -523,9 +613,10 @@ import java.io.*;
 			cont.addFutureMeeting(setpast,date2);
 			cont.addFutureMeeting(setpast2,date4);
 			
-			
-			
+			cont.printMeeting();
 			*/
+			/*
+			
 			
 			Set contact=cont.getContacts(905);
 			Contact isa=null;
@@ -534,7 +625,7 @@ import java.io.*;
 			{
 			 isa= it.next();
 			}
-			//AQUI PUSE LIST L=..... HAY QUE PONER SIEMPRE EL TIPO LIST<MEETING> SINO HACER LA CONVERSION.
+			
 			List<PastMeeting> l=cont.getPastMeetingList(isa);
 			for (int i=0;i<l.size();i++)
 			{
@@ -558,7 +649,54 @@ import java.io.*;
 			}
 			
 			
-				cont.flush();
+			
+			
+			
+			Set<Contact> sc=cont.getContacts(755);
+			Contact domi=null;
+			Iterator<Contact> it2=sc.iterator();
+			while(it2.hasNext())
+			{
+			 domi= it2.next();
+			}
+			List<Meeting> l2=cont.getFutureMeetingList(domi);
+			for (int j=0;j<l2.size();j++)
+			{
+				System.out.println("Date of the meeting:   "+l2.get(j).getDate().getTime()+"   Meeting ID: "+l2.get(j).getId());
+			
+			}
+			
+			
+			Calendar date = Calendar.getInstance();
+			date.set(2013,01,15,16,22,00);
+			Set<Contact> setpast4=cont.getContacts(811,72,995);
+			cont.addFutureMeeting(setpast4,date);
+			
+			
+			/*
+			Set<Contact> sc=cont.getContacts(300);
+			Contact domi=null;
+			Iterator<Contact> it2=sc.iterator();
+			while(it2.hasNext())
+			{
+			 domi= it2.next();
+			}
+			List<PastMeeting> l2=cont.getPastMeetingList(domi);
+			for (int j=0;j<l2.size();j++)
+			{
+				System.out.println("Date of the meeting:   "+l2.get(j).getDate().getTime()+"   Meeting ID: "+l2.get(j).getId());
+			
+			}
+			*/
+			Calendar date3 = Calendar.getInstance();
+			date3.set(2013,9,22,10,30,00);
+			List <Meeting> l=cont.getFutureMeetingList(date3);
+			for (int j=0;j<l.size();j++)
+			{
+				System.out.println("Date of the meeting:   "+l.get(j).getDate().getTime()+"   Meeting ID: "+l.get(j).getId());
+			
+			}
+			cont.flush();
 			
 			}
 

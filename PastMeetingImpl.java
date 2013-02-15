@@ -2,7 +2,7 @@ import java.util.Calendar;
 import java.util.Set;
 import java.io.*;
 
-public class PastMeetingImpl implements PastMeeting,Serializable
+public class PastMeetingImpl implements PastMeeting,Serializable,Comparable<PastMeetingImpl>
 {
 	private int id;
 	private Calendar date;
@@ -20,6 +20,14 @@ public class PastMeetingImpl implements PastMeeting,Serializable
 		this.contacts=contacts;
 		this.date=date;
 		this.notes=text;
+	}
+	public PastMeetingImpl(int id,Calendar date,Set<Contact> contacts,String text)
+	{
+		this.id=id;
+		this.date=date;
+		this.contacts=contacts;
+		this.notes=text;
+		
 	}
 	
 	public int getId()
@@ -47,6 +55,10 @@ public class PastMeetingImpl implements PastMeeting,Serializable
       return this.notes;
 	}
 
+	public void setNotes(String n)
+	{
+       this.notes+="   "+n;
+	}
 	
  @Override
     public int compareTo(PastMeetingImpl o) 
