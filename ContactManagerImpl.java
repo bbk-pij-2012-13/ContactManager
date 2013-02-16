@@ -185,9 +185,9 @@ public class ContactManagerImpl implements ContactManager
 	* @throws IllegalArgumentException if the contact does not exist
 	*Extra information:
 	*variable temp is a List of FutureMeetingImpl;it has been created in order to sort the list by date. 
-	*as we can´t make Meeting implements Comparable since we are not allowed to modify the interfaces.
+	*as we can´t make Meeting implement Comparable since we are not allowed to modify the interfaces.
 	*variable temp2 is a List<Meeting>,cast of temp, due to  the requirement of returning List<Meeting> 
-	*First we sort temp by date and after these "items" are copied and casted to Meeting in the new List<Meeting> temp
+	*First we sort temp by date and after,these "items" are copied and casted to Meeting in the new List<Meeting> temp
 	*/
 	public List<Meeting> getFutureMeetingList(Contact contact)
 	{  
