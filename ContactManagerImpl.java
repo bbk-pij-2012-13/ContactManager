@@ -1,13 +1,25 @@
 import java.util.*;
 import java.io.*;
- class ContactManagerImpl implements ContactManager
+	/**
+	*@author Isabel Reig
+	*ContactManagerImpl class
+	*A class to manage  contacts and meetings.
+	*
+	**/
+ public class ContactManagerImpl implements ContactManager
 {
 		
 		private  Map <Integer,Contact> contacts_set;
-		private final String path="H:\\Agenda5.obj";
+		private final String path="G:\\Agenda.obj";
 		private  Map < Integer,Meeting> agenda;
-		
-
+	
+	
+		/**
+		*Constructor class
+		*@param contacts_set: HashMap that holds all the contacts.
+		*@param agenda:  HashMap that holds all the meetings.
+		*@param paths: String with the address where the file is saved.
+		**/		
 		public ContactManagerImpl()throws IOException,ClassNotFoundException
 		{
 			FileInputStream fi=null;
@@ -18,7 +30,6 @@ import java.io.*;
 				oi=new ObjectInputStream(fi);
 				agenda=(HashMap<Integer,Meeting>)oi.readObject();
 				contacts_set=(HashMap <Integer,Contact>)oi.readObject();
-				
 				oi.close();
 			}
 			catch(FileNotFoundException e)
@@ -31,26 +42,30 @@ import java.io.*;
 			
 		}
 	
-	
 		/**
+		* Add a new meeting to be held in the future.
+		* @param contacts a list of contacts that will participate in the meeting
+		* @param date the date on which the meeting will take place
+		* @return the ID for the meeting
+		* @throws IllegalArgumentException if the meeting is set for a time in the past,
+		* of if any contact is unknown / non-existent
+		* Extra Information:
 		*It has been included a while loop in order to search if it already exists a meeting with the same contacts at the same time 
 		*as nothing will prevent adding a meeting with the same features.
 		*If this happens, the method will not launch an Exception as this situation is not required according to the assignment.
 		*For simplicity it is not taking into account if it's added a meeting at a date where a contact is attending another meeting.
-		**/
+		*/		
 		public int addFutureMeeting(Set<Contact> contacts, Calendar date)
 		{
 			  
 			 Contact temp1=null;
 			 
 			  for(Iterator<Contact> it=contacts.iterator();it.hasNext();)
-				{
-					
+				{					
 					  temp1=it.next();
 					  if (!contacts_set.containsValue(temp1))
 						{
-							throw new IllegalArgumentException(    "Client not found" );
-					 
+							throw new IllegalArgumentException(    "Client not found" );	 
 						}
 						
 				}
@@ -66,13 +81,11 @@ import java.io.*;
 				}
 				
 			  else 
-				{
-			  
+				{			  
 					Set set=agenda.keySet();
 					Iterator<Integer> it=set.iterator();
 					Integer id=null;
-					Meeting m=null;
-					
+					Meeting m=null;					
 					while(it.hasNext())
 					{				
 						id=(Integer)it.next();
@@ -87,20 +100,22 @@ import java.io.*;
 							  }
 							}
 						  
-						}
-					
-					}
-			  
+						}					
+					}			  
 					int j=generate_id_meeting();
 					Meeting tempmeeting= new FutureMeetingImpl(contacts,date,j);
 					agenda.put(j,tempmeeting);
 					return tempmeeting.getId();
 				}
-				
 		}
 		
 		
-		
+		/**
+		* Returns the PAST meeting with the requested ID, or null if it there is none.
+		* @param id the ID for the meeting
+		* @return the meeting with the requested ID, or null if it there is none.
+		* @throws IllegalArgumentException if there is a meeting with that ID happening in the future
+		*/
 		public PastMeeting getPastMeeting(int id)
 		{
 		  
@@ -110,18 +125,14 @@ import java.io.*;
 				return pm;
 			}
 			else if(agenda.get(id).getDate().after(Calendar.getInstance()))
-				{
-					throw new IllegalArgumentException(    "Error" );
-				}
-		  
+			{
+				throw new IllegalArgumentException("Error,there is a meeting with that ID happening in the future" );
+			}
 			else
-				{
-					 pm=(PastMeeting)agenda.get(id);
-				}
-		   
-			return pm;   
-		   
-		  
+			{
+				 pm=(PastMeeting)agenda.get(id);
+			}
+			return pm;   		  
 		}
 		
 		
@@ -238,7 +249,7 @@ import java.io.*;
 				int i=it.next();
 				Meeting m=agenda.get(i);
 				FutureMeetingImpl f;
-				if (m instanceof FutureMeetingImpl && m.getDate()==date)
+				if (m instanceof FutureMeetingImpl && m.getDate().get(Calendar.YEAR)==date.get(Calendar.YEAR) && m.getDate().get(Calendar.MONTH)==date.get(Calendar.MONTH) && m.getDate().get(Calendar.DAY_OF_MONTH)==date.get(Calendar.DAY_OF_MONTH) && m.getDate().get(Calendar.MINUTE)==date.get(Calendar.MINUTE))
 				{
 					f=(FutureMeetingImpl)m;
 					fm.add(f);
@@ -397,7 +408,7 @@ import java.io.*;
 					if(!contacts_set.containsKey(ids[i]))
 					{
 									
-						throw new IllegalArgumentException(    "Id doesn't correspond to a real contact" );
+						throw new IllegalArgumentException(    "Id doesn't correspond to a real contact" +ids[i]);
 					}
 					
 					else
@@ -486,7 +497,8 @@ import java.io.*;
 		
 		
 		/**
-		*For simplicity it has been considered a maximum amount of 1000 contacts. If it is intended to create more than 1000 the method will enter an infinite loop.
+		*For simplicity it has been considered a maximum amount of 1000 contacts. If it is intended to create more than 1000 
+		*the method will enter an infinite loop.
 		**/	
 		
 		public  int generate_id_contact()
@@ -558,8 +570,8 @@ import java.io.*;
        
 			ContactManagerImpl cont=new ContactManagerImpl();
 		
-			/*
 			
+			/*
 			String a="Luisa";
 			String b="Dolores";
 			String c="Domingo";
@@ -573,6 +585,8 @@ import java.io.*;
 			cont.addNewContact(e,"");
 			cont.addNewContact(f,"");
 			cont.printcontacts();
+			
+			*/
 			
 			
 			
@@ -599,11 +613,11 @@ import java.io.*;
 			
 			
 			
-			Set<Contact> setpast=cont.getContacts(755,314);
-			Set<Contact> setpast2=cont.getContacts(755,314,640);
-			Set<Contact> setpast3=cont.getContacts(640,72);
-			Set<Contact> setpast4=cont.getContacts(811,72,995);
-			Set<Contact> setpast5=cont.getContacts(314,755,811);
+			Set<Contact> setpast=cont.getContacts(427,598);
+			Set<Contact> setpast2=cont.getContacts(598,387,739);
+			Set<Contact> setpast3=cont.getContacts(739,427);
+			Set<Contact> setpast4=cont.getContacts(598,739,160);
+			Set<Contact> setpast5=cont.getContacts(427,739,598);
 			cont.addNewPastMeeting(setpast3,date5,"Esta es la primera prueba addNewPastMewegin");
 			cont.addNewPastMeeting(setpast,date6,"Esta es la ssegunda prueba addNewtPastMewegin");
 			cont.addNewPastMeeting(setpast4,date7,"Esta es la tercera prueba addNewPastMewegin");
@@ -614,9 +628,9 @@ import java.io.*;
 			cont.addFutureMeeting(setpast2,date4);
 			
 			cont.printMeeting();
-			*/
-			/*
 			
+			
+			/*
 			
 			Set contact=cont.getContacts(905);
 			Contact isa=null;
@@ -687,7 +701,7 @@ import java.io.*;
 				System.out.println("Date of the meeting:   "+l2.get(j).getDate().getTime()+"   Meeting ID: "+l2.get(j).getId());
 			
 			}
-			*/
+			
 			Calendar date3 = Calendar.getInstance();
 			date3.set(2013,9,22,10,30,00);
 			List <Meeting> l=cont.getFutureMeetingList(date3);
@@ -696,6 +710,7 @@ import java.io.*;
 				System.out.println("Date of the meeting:   "+l.get(j).getDate().getTime()+"   Meeting ID: "+l.get(j).getId());
 			
 			}
+			*/
 			cont.flush();
 			
 			}

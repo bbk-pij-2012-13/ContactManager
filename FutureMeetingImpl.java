@@ -69,7 +69,7 @@ public class FutureMeetingImpl  implements FutureMeeting,Serializable,Comparable
 	public Calendar getDate()
 	{
 	
-		System.out.println("FM getadate()");
+		
 		return this.date;
 	
 	}
