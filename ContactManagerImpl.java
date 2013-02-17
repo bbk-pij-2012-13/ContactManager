@@ -18,8 +18,8 @@ public class ContactManagerImpl implements ContactManager
 		
 	/**
 	*Constructor class
-	*@param contacts_set: HashMap that holds all the contacts.
-	*@param agenda:  HashMap that holds all the meetings.
+	*@param contacts_set: HashSet that stores all the contacts.
+	*@param agenda:  HashMap that stores all the meetings.
 	*@param paths: String with the address where the file is saved.
 	* @throws IOException,ClassNotFoundException.
 	**/		
@@ -57,6 +57,7 @@ public class ContactManagerImpl implements ContactManager
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date)
 	{			  
 		Contact temp1=null;	 
+		
 		for(Iterator<Contact> it=contacts.iterator();it.hasNext();)
 		{					
 			temp1=it.next();
@@ -176,18 +177,14 @@ public class ContactManagerImpl implements ContactManager
 
 		
 	/**
-	*Return the list of future meetings that are scheduled for this contact.
+	* Return the list of future meetings that are scheduled for this contact.
 	* If there are none, the returned list will be empty. Otherwise,
 	* the list will be chronologically sorted and will not contain any
 	* duplicates.
+	*
 	* @param contact one of the user’s contacts
 	* @return the list of future meeting(s) scheduled with this contact (maybe empty).
 	* @throws IllegalArgumentException if the contact does not exist
-	*Extra information:
-	*variable temp is a List of FutureMeetingImpl;it has been created in order to sort the list by date. 
-	*as we can´t make Meeting implement Comparable since we are not allowed to modify the interfaces.
-	*variable temp2 is a List<Meeting>,cast of temp, due to  the requirement of returning List<Meeting> 
-	*First we sort temp by date and after,these "items" are copied and casted to Meeting in the new List<Meeting> temp
 	*/
 	public List<Meeting> getFutureMeetingList(Contact contact)
 	{  
@@ -501,56 +498,66 @@ public class ContactManagerImpl implements ContactManager
 	}
 		
 		
-		public void printcontacts()
+		
+	/**
+	* This methods prints all the contacts in the contacts_set.
+	*
+	*/	
+	public void printcontacts()
+	{
+		
+		Iterator<Contact> it=contacts_set.iterator();
+		Contact c= null;
+		int i=1;
+		while(it.hasNext())
 		{
-			
-			Iterator<Contact> it=contacts_set.iterator();
-			Contact c= null;
-			int i=1;
-			while(it.hasNext())
-			{
-				c= it.next();
-				System.out.println(c.getId()+"...."+i+"-------"+c.getName());
-				i++;
-			}
+			c= it.next();
+			System.out.println(c.getId()+"...."+i+"-------"+c.getName());
+			i++;
 		}
+	}
 
 	
-		public void printMeeting()
-		{
-			Set set=agenda.keySet();
-			Iterator<Integer> it=set.iterator();
-			Integer id=null;
-			Meeting m;
-			
-			while(it.hasNext())
-			{
-				int k=0;
-				System.out.println();
-				id=(Integer)it.next();
-				m=(Meeting)agenda.get(id);
-				System.out.println();
-				System.out.println(m.getId()+"...."+m.getDate().getTime());
-				Set st=m.getContacts();
-				Iterator<Contact> it2=st.iterator();
-				Contact c=null;
-				while (it2.hasNext())
-				{
-					c=it2.next();
-					System.out.print( "Contact: "+k+"   "  +c.getName()+"..."+c.getId()+"      ");
-					k++;
-				}
-				
-			
-			}
-		}
+	/**
+	* This methods prints all the meetings in the agenda.
+	*
+	*/
+	public void printMeeting()
+	{
+		Set set=agenda.keySet();
+		Iterator<Integer> it=set.iterator();
+		Integer id=null;
+		Meeting m;
 		
+		while(it.hasNext())
+		{
+			int k=0;
+			System.out.println();
+			id=(Integer)it.next();
+			m=(Meeting)agenda.get(id);
+			System.out.println();
+			System.out.println(m.getId()+"...."+m.getDate().getTime());
+			Set st=m.getContacts();
+			Iterator<Contact> it2=st.iterator();
+			Contact c=null;
+			while (it2.hasNext())
+			{
+				c=it2.next();
+				System.out.print( "Contact: "+k+"   "  +c.getName()+"..."+c.getId()+"      ");
+				k++;
+			}
+			
+		
+		}
+	}
+	
 		
 	/**
 	*This method generates a random contact id between 0 and 1000.
-	*For simplicity it has been considered a maximum amount of 1000 contacts. If it is intended to create more than 1000 
-	*the method will enter an infinite loop(this can be avoided by declaring an static variable which counts how many contacts have been created so far
-	*and that prevent the program to create more once it has been added 1000 contacts).
+	*For simplicity it has been considered a maximum amount of 1000 contacts. 
+	*If it is attempted to create more than 1000 
+	*the method will enter an infinite loop.
+	*
 	*@return contact_id,int.
 	**/	
 	
@@ -581,9 +588,10 @@ public class ContactManagerImpl implements ContactManager
 		
 	/**
 	*This method generates a random meeting id between 0 and 1000.
-	*For simplicity it has been considered a maximum amount of 1000 meetings. If it is intended to create more than 1000 
-	*the method will enter an infinite loop(this can be avoided by declaring an static variable which counts 
-	*how many meetings have been created so far and that prevent the program to create more,once it has been added 1000 meetings).
+	*For simplicity it has been considered a maximum amount of 1000 meetings. If it is attempted
+	*to create more than 1000 
+	*the method will enter an infinite loop.
+	*
 	*@return contact_id,int.
 	**/
 	public  int generate_id_meeting()
@@ -601,7 +609,14 @@ public class ContactManagerImpl implements ContactManager
 	}
 		 
 
-	
+	/**
+	* Save all data to disk.
+	*
+	* This method is  executed when the program is
+	* closed and when/if the user requests it.
+	*
+	*@throws IOException if there's a problem with IO.
+	*/	
 	
 	public void flush() 
 	{
@@ -621,14 +636,20 @@ public class ContactManagerImpl implements ContactManager
 		}
 	}
 		
+	/**
+	* This methods instantiate an object of ContactManagerImpl
+	* and also include the User Interface with several options
+	* to add Meetings, get meetings, add new Contacts etc.
+	*
+	*@throws IOException ,ClassNotFoundException.
+	*/		
 		
-		
-public static void main(String[] args) throws IOException,ClassNotFoundException
+	public static void main(String[] args) throws IOException,ClassNotFoundException
 	{
    
 		ContactManagerImpl cont=new ContactManagerImpl();
-		System.out.println("Wellcome,Bienvenido,Bienvenue");
-		System.out.println("Please select one of the folowing functions" +"  "+"15 EXIT ");
+		System.out.println("Wellcome to the 2º CourseWork of Programming in Java");
+		System.out.println("Please select one of the folowing functions" +"  "+" press 16 EXIT ");
 		BufferedReader bf=new BufferedReader(new InputStreamReader(System.in));
 		int opc;
 		Set<Contact> scontacts;
@@ -652,10 +673,11 @@ public static void main(String[] args) throws IOException,ClassNotFoundException
 			System.out.println("9.add MeetingNotes ");
 			System.out.println("10.add New Contact");
 			System.out.println("11. get Contacts by Id");
-			System.out.println("11. get Contacts by Name");
-			System.out.println("12. Save");
-			System.out.println("13. PrintMeeting Contacts");
-			System.out.println("14. Exit");
+			System.out.println("12. get Contacts by Name");
+			System.out.println("13. Save");
+			System.out.println("14. Prin tMeetings ");
+			System.out.println("15. Print Contacts");
+			System.out.println("16. Exit");
 			opc=Integer.parseInt(bf.readLine());
 
 			switch(opc)
@@ -839,7 +861,27 @@ public static void main(String[] args) throws IOException,ClassNotFoundException
 				cont.addNewContact(name,notes);
 				break;
 				
+				
 				case 11:
+				List <Integer> temp= new ArrayList();
+				Set <Contact> result;
+				do
+					{
+						System.out.println("Please introduce the id of the  contact----press 0 when finishing");
+						id=Integer.parseInt(bf.readLine());
+						if(id!=0)
+						{
+						temp.add(id);
+						}
+					} while(id!=0);
+				int[] ids=new int[temp.size()];
+				for (int i=0;i<temp.size();i++)
+				{
+				 ids[i]=temp.get(i);
+				}
+				result=cont.getContacts(ids);
+				
+				case 12:
 				//"11. get Contacts by Name"
 				System.out.println("Introuduce the name of the contact");
 				name=bf.readLine();
@@ -853,23 +895,26 @@ public static void main(String[] args) throws IOException,ClassNotFoundException
 				
 				break;
 				
-				case 12:
-				cont.flush();
-				break;
-				
 				case 13:
-				cont.printMeeting();
+				cont.flush();
 				break;
 				
 				case 14:
-				cont.printcontacts();
+				cont.printMeeting();
 				break;
 				
 				case 15:
+				cont.printcontacts();
+				break;
+				
+				case 16:
 				cont.flush();
 				break;
+				
+				default: System.out.println ("Invalid option");
+                break;
 			}
-		}while(opc!=15);
+		}while(opc!=16);
 	}
 
 }
