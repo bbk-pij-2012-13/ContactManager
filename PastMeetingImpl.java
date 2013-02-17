@@ -77,12 +77,12 @@ public class PastMeetingImpl implements PastMeeting,Serializable,Comparable<Past
 	*/
 	public String getNotes()
 	{
-      return this.notes;
+      		return this.notes;
 	}
 
 	public void setNotes(String n)
 	{
-       this.notes+="   "+n;
+       		this.notes+="   "+n;
 	}
 	
  
@@ -91,7 +91,7 @@ public class PastMeetingImpl implements PastMeeting,Serializable,Comparable<Past
  @Override
     public int compareTo(PastMeetingImpl o) 
 	{
-        if (this.getDate().compareTo(o.getDate())>0)
+		if (this.getDate().compareTo(o.getDate())>0)
 		{
 			return 1;
 		
@@ -105,13 +105,8 @@ public class PastMeetingImpl implements PastMeeting,Serializable,Comparable<Past
 		 
 		 {
 		 return 0;
-		 }
-		
-		
-		//return (this.getDate().before(o.getDate()) ? 1 : (this.getDate().after(o.getDate())) ? -1 : 0);
-    }	
-	
-	
+		 }	
+   	 }		
 	
 }
 
