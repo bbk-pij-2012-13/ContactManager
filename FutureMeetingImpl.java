@@ -1,7 +1,11 @@
 import java.util.Calendar;
 import java.util.Set;
 import java.io.*;
-
+/**
+**@author Isabel Reig 
+*class,PastMeetingImpl
+*A meeting that will be held in the future.
+*/
 
 public class FutureMeetingImpl  implements FutureMeeting,Serializable,Comparable<FutureMeetingImpl>
 {
@@ -10,6 +14,12 @@ public class FutureMeetingImpl  implements FutureMeeting,Serializable,Comparable
 	private Calendar date;
 	private Set<Contact> contacts;
 	
+	/**
+	*Constructor class.
+	*@param contacts: Set of contacts of the meeting.
+	*@param date:  Calendar date of the meeting.
+	*@param id: int id.
+	**/
 	public FutureMeetingImpl(Set<Contact> conta,Calendar date,int id)
 	{
 		this.contacts=conta;
@@ -17,54 +27,21 @@ public class FutureMeetingImpl  implements FutureMeeting,Serializable,Comparable
 		this.id=id;
 	}
 
-	public FutureMeetingImpl(Set<Contact> conta,Calendar date)
-	{
-		this.contacts=conta;
-		this.date=date;
-		
-	}
-	
+	/**
+	* Returns the id of the meeting.
+	*
+	* @return the id of the meeting.
+	*/	
 	public int getId()
 	{
 	  return this.id;
-	
 	}
 
+	
 	/**
-	*This method has been include to avoid that a meeting with a different id but the same contacts at a same date is added.
-	**/
-	/*
-	@Override
-	public boolean equals (Object o)
-	{
-		if(o!=null && o instanceof FutureMeetingImpl)
-		{
-			FutureMeetingImpl fm=(FutureMeetinImpl)o;
-			
-			if(this.id==fm.getId() && this.contacts.containsAll(fm.getContacts()))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return false;
-		}
-		
-
-	}
-	
-	@Override
-	public int hashCode()
-	{
-	  return this.id;
-	
-	
-	}
+	* Return the date of the meeting.
+	*
+	* @return the date of the meeting.
 	*/
 	public Calendar getDate()
 	{
@@ -74,11 +51,19 @@ public class FutureMeetingImpl  implements FutureMeeting,Serializable,Comparable
 	
 	}
 
+	
+	/**
+	* Return the details of people that attended the meeting.
+	*
+	* The list contains a minimum of one contact (if there were
+	* just two people: the user and the contact) and may contain an
+	* arbitraty number of them.
+	*
+	* @return the details of people that attended the meeting.
+	*/
 	public Set<Contact> getContacts()
 	{
-	
 	 return contacts;
-	
 	}
 
 	/**
@@ -90,22 +75,14 @@ public class FutureMeetingImpl  implements FutureMeeting,Serializable,Comparable
         if (this.getDate().compareTo(o.getDate())>0)
 		{
 			return 1;
-		
 		}
 		if (this.getDate().compareTo(o.getDate())<0)
 		{
 			return -1;
-		
 		}
-		
 		else
-		 
-		 {
-		 return 0;
-		 }
-		
-		
-	
+		{
+			return 0;
+		}	
     }
-
 }

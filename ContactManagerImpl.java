@@ -67,8 +67,8 @@ public class ContactManagerImpl implements ContactManager
 		}
 		if ( date.before(Calendar.getInstance())) 
 		{		
-			System.out.println("no lo encuentro");	
-			throw new IllegalArgumentException(    "Error" );		
+				
+			throw new IllegalArgumentException(    "Error:Date before the current date " );		
 		}	
 		else 
 		{			  
@@ -487,7 +487,6 @@ public class ContactManagerImpl implements ContactManager
 		
 		public void printcontacts()
 		{
-			
 			Set set=contacts_set.keySet();
 			Iterator<Integer> it=set.iterator();
 			Integer j=null;
@@ -497,10 +496,7 @@ public class ContactManagerImpl implements ContactManager
 				j=(Integer)it.next();
 				c=(Contact)contacts_set.get(j);
 				System.out.println(c.getId()+"...."+j+"-------"+c.getName());
-			  
 			}
-			
-				
 		}
 
 	
@@ -513,8 +509,8 @@ public class ContactManagerImpl implements ContactManager
 			
 			while(it.hasNext())
 			{
+				int k=0;
 				System.out.println();
-				int k=1;
 				id=(Integer)it.next();
 				m=(Meeting)agenda.get(id);
 				System.out.println();
@@ -528,7 +524,7 @@ public class ContactManagerImpl implements ContactManager
 					System.out.print( "Contact: "+k+"   "  +c.getName()+"..."+c.getId()+"      ");
 					k++;
 				}
-			
+				
 			
 			}
 		}
@@ -607,9 +603,18 @@ public class ContactManagerImpl implements ContactManager
    
 		ContactManagerImpl cont=new ContactManagerImpl();
 		System.out.println("Wellcome,Bienvenido,Bienvenue");
-		System.out.println("Please select one of the folowing functions" +"  "+"O for exist");
+		System.out.println("Please select one of the folowing functions" +"  "+"15 EXIT ");
 		BufferedReader bf=new BufferedReader(new InputStreamReader(System.in));
 		int opc;
+		Set<Contact> scontacts;
+		Contact c;
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		String date,notes,name;
+		Date d;
+		Calendar cal=Calendar.getInstance();
+		List<Meeting> l;
+		List<PastMeeting> lp;
+		ArrayList<Integer> idcontacts=new ArrayList();
 		do
 		{
 			System.out.println("1.AddFutureMeeting");
@@ -632,13 +637,11 @@ public class ContactManagerImpl implements ContactManager
 			switch(opc)
 			{
 				case 1:
-				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-				String date;
-				Date d;
-				Calendar cal=Calendar.getInstance();
-				ArrayList<Integer> idcontacts=null;
+				
+				
 				int id;
-				Set<Contact> scontacts= null;
+				scontacts= null;
+				idcontacts.clear();
 				try
 				{
 					 System.out.println("Please introduce the date of the meeting. Format available:'dd/MM/yyyy HH:mm'");
@@ -675,40 +678,150 @@ public class ContactManagerImpl implements ContactManager
 				break;
 				
 				case 2:
+				//getPastMeetingbyId
+				System.out.println("Please introduce the id of the  meeting");
+				id=Integer.parseInt(bf.readLine());
+				PastMeeting p=cont.getPastMeeting(id);
+				System.out.println(p.getDate().getTime());
 				break;
-				
+			
 				case 3:
+				//"3.get FutureMeeting by Id"
+				System.out.println("Please introduce the id of the  meeting");
+				id=Integer.parseInt(bf.readLine());
+				FutureMeeting f=cont.getFutureMeeting(id);
+				System.out.println(f.getDate().getTime());
 				break;
 				
 				case 4:
+				//"4.get Meeting by Id"
+				System.out.println("Please introduce the id of the  meeting");
+				id=Integer.parseInt(bf.readLine());
+				Meeting m=cont.getMeeting(id);
+				System.out.println(m.getDate().getTime());
 				break;
 				
 				case 5:
+				//"5.get FutureMeetingList by Contact"
+				scontacts= null;
+				System.out.println("Please introduce the id of the  contact");
+				id=Integer.parseInt(bf.readLine());
+				scontacts=cont.getContacts(id);
+				c=(Contact)(scontacts.toArray())[0];
+				l=cont.getFutureMeetingList(c);
+				for (int j=0;j<l.size();j++)
+				{
+					System.out.println("Date of the meeting:   "+l.get(j).getDate().getTime()+"   Meeting ID: "+l.get(j).getId());
+				}
 				break;
 				
 				case 6:
+				//"6.get FutureMeetingList by Date"
+				try
+				{
+					 System.out.println("Please introduce the date of the meeting. Format available:'dd/MM/yyyy HH:mm'");
+					 date=bf.readLine();
+					 d= (Date)formatter.parse(date); 
+					 cal.setTime(d);
+				}
+				catch (ParseException e)
+				{
+				  // execution will come here if the String that is given
+				  // does not match the expected format.
+				  e.printStackTrace();
+				}
+				l=cont.getFutureMeetingList(cal);
+				for (int j=0;j<l.size();j++)
+				{
+					System.out.println("Date of the meeting:Meeting ID:  "+l.get(j).getId());
+				}
 				break;
 				
 				case 7:
+				//"7.get PastMeetingList by Contact"
+				scontacts= null;
+				System.out.println("Please introduce the id of the  contact");
+				id=Integer.parseInt(bf.readLine());
+				scontacts=cont.getContacts(id);
+				c=(Contact)(scontacts.toArray())[0];
+				lp=cont.getPastMeetingList(c);
+				for (int j=0;j<lp.size();j++)
+				{
+					System.out.println("Date of the meeting:   "+lp.get(j).getDate().getTime()+"   Meeting ID: "+lp.get(j).getId());
+				}
 				break;
 				
 				case 8:
+				scontacts=null;
+				idcontacts.clear();
+				//	public void addNewPastMeeting(Set<Contact> contacts,Calendar date,String text)
+				
+				try
+				{
+					 System.out.println("Please introduce the date of the meeting. Format available:'dd/MM/yyyy HH:mm'");
+					 date=bf.readLine();
+					 d= (Date)formatter.parse(date); 
+					cal.setTime(d);
+				}
+				catch (ParseException e)
+				{
+				  // execution will come here if the String that is given
+				  // does not match the expected format.
+				  e.printStackTrace();
+				}
+				System.out.println("Please introduce the notes, no more than a line");
+				notes=bf.readLine();
+				do
+					{
+						System.out.println("Please introduce the id of the  contact----press 0 when finishing");
+						id=Integer.parseInt(bf.readLine());
+						if(id!=0)
+						{
+						 idcontacts.add(id);
+						}
+					} while(id!=0);
+				if(idcontacts!=null)
+				{
+					int[] ids= new int[idcontacts.size()];
+					for (int j=0;j<idcontacts.size();j++)
+					{
+					 ids[j]=idcontacts.get(j);
+					}
+					scontacts=cont.getContacts(ids);
+				}
+				cont.addNewPastMeeting(scontacts,cal,notes);
 				break;
 				
 				case 9:
+				//"9.add MeetingNotes (int id, String text)"
+				System.out.println("Please introduce the id of the  meeting");
+				id=Integer.parseInt(bf.readLine());
+				System.out.println("Please introduce the notes, no more than a line");
+				notes=bf.readLine();
+				cont.addMeetingNotes(id,notes);
 				break;
 				
 				case 10:
-				
+				//"10.add New Contact"
 				System.out.println("Introuduce the name of the contact");
-				String name=bf.readLine();
+				name=bf.readLine();
 				System.out.println("Introduce the notes of the contact");
-				String notes=bf.readLine();
+				notes=bf.readLine();
 				cont.addNewContact(name,notes);
-				
 				break;
 				
 				case 11:
+				//"11. get Contacts by Name"
+				System.out.println("Introuduce the name of the contact");
+				name=bf.readLine();
+				scontacts=cont.getContacts(name);
+				Iterator<Contact> it2=scontacts.iterator();
+				while(it2.hasNext())
+				{
+				 c= it2.next();
+				 System.out.println(c.getName());
+				}
+				
 				break;
 				
 				case 12:
@@ -717,15 +830,17 @@ public class ContactManagerImpl implements ContactManager
 				
 				case 13:
 				cont.printMeeting();
-				cont.printcontacts();
+				break;
 				
 				case 14:
+				cont.printcontacts();
+				break;
+				
+				case 15:
 				cont.flush();
 				break;
 			}
-		}while(opc!=14);
-			
-			
+		}while(opc!=15);
 	}
 
 }
