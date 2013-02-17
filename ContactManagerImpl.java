@@ -3,15 +3,17 @@ import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+
 /**
 *@author Isabel Reig
+*
 *ContactManagerImpl class
 *A class to manage  contacts and meetings.
 */
 public class ContactManagerImpl implements ContactManager
 {		
-	private  Map <Integer,Contact> contacts_set;
-	private final String path="G:\\Agenda.obj";
+	private  Set <Contact> contacts_set;
+	private final String path="G:\\Agenda4.obj";
 	private  Map < Integer,Meeting> agenda;
 		
 	/**
@@ -30,29 +32,27 @@ public class ContactManagerImpl implements ContactManager
 			fi = new FileInputStream (path);
 			oi=new ObjectInputStream(fi);
 			agenda=(HashMap<Integer,Meeting>)oi.readObject();
-			contacts_set=(HashMap <Integer,Contact>)oi.readObject();
+			contacts_set=(HashSet <Contact>)oi.readObject();
 			oi.close();
 		}
 		catch(FileNotFoundException e)
 		{
 			agenda= new HashMap<Integer,Meeting>();
-			contacts_set= new HashMap <Integer,Contact>();			
+			contacts_set= new HashSet <Contact>();			
 		}
 	}
 	
 	
 	/**
 	* Add a new meeting to be held in the future.
+	* The program will inform if it's attempted to intoduce a meeting with the same contacts 
+	* at the same time ,as nothing will prevent adding a meeting with the same features.
+	*
 	* @param contacts a list of contacts that will participate in the meeting
 	* @param date the date on which the meeting will take place
 	* @return the ID for the meeting
 	* @throws IllegalArgumentException if the meeting is set for a time in the past,
 	* of if any contact is unknown / non-existent
-	* Extra Information:
-	*It has been included a while loop in order to search if it already exists a meeting with the same contacts at the same time 
-	*as nothing will prevent adding a meeting with the same features.
-	*If this happens, the method will not launch an Exception as this situation is not required according to the assignment.
-	*For simplicity it is not taking into account if it's added a meeting at a date where a contact is attending another meeting.
 	*/		
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date)
 	{			  
@@ -60,7 +60,7 @@ public class ContactManagerImpl implements ContactManager
 		for(Iterator<Contact> it=contacts.iterator();it.hasNext();)
 		{					
 			temp1=it.next();
-			if (!contacts_set.containsValue(temp1))
+			if (!contacts_set.contains(temp1))
 			{
 				throw new IllegalArgumentException(    "Client not found" );	 
 			}	
@@ -191,7 +191,7 @@ public class ContactManagerImpl implements ContactManager
 	*/
 	public List<Meeting> getFutureMeetingList(Contact contact)
 	{  
-		if(!contacts_set.containsValue(contact))
+		if(!contacts_set.contains(contact))
 		{
 				 throw new IllegalArgumentException(    "Id doesn't correspond to a real contact" );
 		}
@@ -219,13 +219,17 @@ public class ContactManagerImpl implements ContactManager
 				  i++;
 				}
 			}
+			else
+			{
+			 m=null;
+			}
 		}
 		if (temp!=null)
 		{
 			Collections.sort(temp);		
 			for (int j=0;j<temp.size();j++)
 			{
-			 temp2.add(j,(Meeting)temp.get(j));
+			 temp2.add((Meeting)temp.get(j));
 			}
 		}
 		return temp2;
@@ -245,8 +249,8 @@ public class ContactManagerImpl implements ContactManager
 	{	
 		Set<Integer> set=agenda.keySet();
 		Iterator<Integer> it=set.iterator();
-		List <FutureMeetingImpl> fm =null;
-		List<Meeting> result=null;
+		List <FutureMeetingImpl> fm =new ArrayList <FutureMeetingImpl>();
+		List<Meeting> result=new ArrayList<Meeting>();
 		while(it.hasNext())
 		{
 			int i=it.next();
@@ -285,7 +289,7 @@ public class ContactManagerImpl implements ContactManager
 	{
 		List<PastMeetingImpl> lspast=new ArrayList<PastMeetingImpl>();
 		List<PastMeeting> lspast2=new ArrayList<PastMeeting>();
-		if(!contacts_set.containsValue(c))
+		if(!contacts_set.contains(c))
 		{
 			throw new IllegalArgumentException(    "Id doesn't correspond to a real contact" ); 
 		}
@@ -348,7 +352,7 @@ public class ContactManagerImpl implements ContactManager
 			for(Iterator<Contact> it=contacts.iterator();it.hasNext();)
 			{
 				temp1=it.next();
-			   if (!contacts_set.containsValue(temp1))
+			   if (!contacts_set.contains(temp1))
 				{
 					throw new IllegalArgumentException(    "Client not found" );
 				}						
@@ -419,7 +423,7 @@ public class ContactManagerImpl implements ContactManager
 	{	
 		int j=generate_id_contact();
 		Contact c= new ContactImpl(name,notes,j);
-		contacts_set.put(j,c); 
+		contacts_set.add(c); 
 	}
 
 		
@@ -433,21 +437,36 @@ public class ContactManagerImpl implements ContactManager
 	*/				
 	public Set<Contact> getContacts(int... ids)
 	{
-		Set<Contact> set= new HashSet<Contact> ();
-		Contact temp=null;
-		for (int i=0;i<ids.length;i++)
+		
+		Set <Contact> result= new HashSet <Contact>();
+		int length=ids.length;
+		boolean []  found= new boolean [length];
+		for (int m=0;m<length;m++)
 		{
-			if(!contacts_set.containsKey(ids[i]))
-			{
-							
-				throw new IllegalArgumentException(    "Id doesn't correspond to a real contact" +ids[i]);
-			}
-			else
-			{
-				set.add(contacts_set.get(ids[i]));	
-			}	 
+		 found [m]=false;
 		}
-		return set;
+		int lengthset=contacts_set.size();
+		for( int i=0;i<length;i++)
+		{	  
+			Iterator<Contact> it=contacts_set.iterator();
+			Contact temp;
+			int k=0;
+			while(it.hasNext())
+			{ 
+				temp=it.next();
+				if( ids[i]==temp.getId())
+				{
+					found[i]=true;
+					result.add(temp);
+				}
+				else if (k==lengthset-1 && !found[i])
+				{
+					throw new IllegalArgumentException(    "Id doesn't correspond to a real contact" +ids[i]);
+				}
+				k++;
+			}
+		}
+		return result;
 	}
 	
 	/**
@@ -463,14 +482,11 @@ public class ContactManagerImpl implements ContactManager
 		Set<Contact> result=new HashSet<Contact> ();
 		if (name!=null)
 		{
-			Set set=contacts_set.keySet();
-			Iterator<Integer> it=set.iterator();
-			Integer j=null;
-			Contact c= null;
+			Iterator<Contact> it=contacts_set.iterator();
+			Contact c;
 			while(it.hasNext())
 			{
-				j=(Integer)it.next();
-				c=(Contact)contacts_set.get(j);
+				c=it.next();
 				if(c.getName().equals(name))
 				{
 					result.add(c);				
@@ -487,15 +503,15 @@ public class ContactManagerImpl implements ContactManager
 		
 		public void printcontacts()
 		{
-			Set set=contacts_set.keySet();
-			Iterator<Integer> it=set.iterator();
-			Integer j=null;
+			
+			Iterator<Contact> it=contacts_set.iterator();
 			Contact c= null;
+			int i=1;
 			while(it.hasNext())
 			{
-				j=(Integer)it.next();
-				c=(Contact)contacts_set.get(j);
-				System.out.println(c.getId()+"...."+j+"-------"+c.getName());
+				c= it.next();
+				System.out.println(c.getId()+"...."+i+"-------"+c.getName());
+				i++;
 			}
 		}
 
@@ -505,7 +521,7 @@ public class ContactManagerImpl implements ContactManager
 			Set set=agenda.keySet();
 			Iterator<Integer> it=set.iterator();
 			Integer id=null;
-			Meeting m=null;
+			Meeting m;
 			
 			while(it.hasNext())
 			{
@@ -541,13 +557,22 @@ public class ContactManagerImpl implements ContactManager
 	public  int generate_id_contact()
 	{			
 		int j=(int)(Math.random()*1000+1);
-		if(contacts_set.containsKey(j))
+		Iterator<Contact> it=contacts_set.iterator();
+		Contact c;
+		int lengthset=contacts_set.size();
+		int k=0;
+		while(it.hasNext())
 		{
-			generate_id_contact();
-		}
-		if (!contacts_set.containsKey(j))
-		{
-			return j;
+			c= it.next();
+			if (c.getId()==j)
+			{
+				generate_id_contact();
+			}
+			else if (k==lengthset-1)
+			{
+			  break;
+			}
+			k++;
 		}
 		return j;
 	}
@@ -598,7 +623,7 @@ public class ContactManagerImpl implements ContactManager
 		
 		
 		
-	public static void main(String[] args) throws IOException,ClassNotFoundException
+public static void main(String[] args) throws IOException,ClassNotFoundException
 	{
    
 		ContactManagerImpl cont=new ContactManagerImpl();
@@ -610,8 +635,7 @@ public class ContactManagerImpl implements ContactManager
 		Contact c;
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 		String date,notes,name;
-		Date d;
-		Calendar cal=Calendar.getInstance();
+		
 		List<Meeting> l;
 		List<PastMeeting> lp;
 		ArrayList<Integer> idcontacts=new ArrayList();
@@ -637,8 +661,8 @@ public class ContactManagerImpl implements ContactManager
 			switch(opc)
 			{
 				case 1:
-				
-				
+				Date d;
+				Calendar cal=Calendar.getInstance();
 				int id;
 				scontacts= null;
 				idcontacts.clear();
@@ -717,12 +741,14 @@ public class ContactManagerImpl implements ContactManager
 				
 				case 6:
 				//"6.get FutureMeetingList by Date"
+				Date d2;
+				Calendar cal2=Calendar.getInstance();
 				try
 				{
 					 System.out.println("Please introduce the date of the meeting. Format available:'dd/MM/yyyy HH:mm'");
 					 date=bf.readLine();
-					 d= (Date)formatter.parse(date); 
-					 cal.setTime(d);
+					 d2= (Date)formatter.parse(date); 
+					 cal2.setTime(d2);
 				}
 				catch (ParseException e)
 				{
@@ -730,7 +756,7 @@ public class ContactManagerImpl implements ContactManager
 				  // does not match the expected format.
 				  e.printStackTrace();
 				}
-				l=cont.getFutureMeetingList(cal);
+				l=cont.getFutureMeetingList(cal2);
 				for (int j=0;j<l.size();j++)
 				{
 					System.out.println("Date of the meeting:Meeting ID:  "+l.get(j).getId());
@@ -754,19 +780,22 @@ public class ContactManagerImpl implements ContactManager
 				case 8:
 				scontacts=null;
 				idcontacts.clear();
+				Date d3;
+				Calendar cal3=Calendar.getInstance();
 				//	public void addNewPastMeeting(Set<Contact> contacts,Calendar date,String text)
 				
 				try
 				{
 					 System.out.println("Please introduce the date of the meeting. Format available:'dd/MM/yyyy HH:mm'");
 					 date=bf.readLine();
-					 d= (Date)formatter.parse(date); 
-					cal.setTime(d);
+					 d3= (Date)formatter.parse(date); 
+					cal3.setTime(d3);
 				}
 				catch (ParseException e)
 				{
 				  // execution will come here if the String that is given
 				  // does not match the expected format.
+				  cal3=null;
 				  e.printStackTrace();
 				}
 				System.out.println("Please introduce the notes, no more than a line");
@@ -789,7 +818,7 @@ public class ContactManagerImpl implements ContactManager
 					}
 					scontacts=cont.getContacts(ids);
 				}
-				cont.addNewPastMeeting(scontacts,cal,notes);
+				cont.addNewPastMeeting(scontacts,cal3,notes);
 				break;
 				
 				case 9:
